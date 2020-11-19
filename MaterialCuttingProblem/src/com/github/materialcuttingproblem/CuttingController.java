@@ -10,9 +10,15 @@ public class CuttingController {
         //printInstructions();
         ArrayList<Stock> stocks = new ArrayList<>();
         boolean running = true;
-        int[] order1 = {20,25,30};
-        int[] order1Quantities = {2, 2 ,3};
-        Order order = new Order(order1, order1Quantities);
+//        int[] order1 = {20,25,30};
+//        int[] order1Quantities = {2, 2 ,3};
+//        Order order = new Order(order1, order1Quantities);
+
+        /*Fitness function = for each activity, work out the cost of the stock length used, k is the total number
+        of activities
+        Fitness = sum of i , where I belongs to set k , cost(activity (i))
+        */
+
 //        while (running) {
 //            System.out.println();
 //            System.out.println("Select a command");
