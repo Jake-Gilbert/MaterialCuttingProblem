@@ -2,23 +2,17 @@ package com.github.materialcuttingproblem;
 
 public class Stock {
 
-    private double length;
-    private double cutLength;
+    private int length;
+
     public Stock(int length) {
         this.length = length;
-        cutLength = 0;
     }
 
-    public double getLength() {
+    public int getLength() {
         return length;
     }
 
-    public void cutStock(int lengthToCut) {
-        if (lengthToCut <= length) {
-            length -= lengthToCut;
-            cutLength = lengthToCut;
-            System.out.println("Stock has been cut");
-            System.out.println(length + " stock remaining");
-        }
+    public void setLength(int newLength) {
+        this.length = newLength;
     }
 }

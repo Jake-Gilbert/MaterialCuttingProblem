@@ -6,22 +6,23 @@ import java.util.ArrayList;
 
 public class FileReaderClass {
 
-
+        ArrayList<Order> allOrders;
         public FileReaderClass(final String CSV) {
-            initialiseCollection(CSV);
+            allOrders = new ArrayList<>();
+             allOrders.add(initialiseCollection(CSV));
         }
 
         private Order initialiseCollection(String CSV) {
                 BufferedReader csvReader = null;
                 String line = "";
-                ArrayList<String[]> dataInCsv = new ArrayList<>();
+                ArrayList<String[]> dataInCsv = new ArrayList<>();;
                 int pointer = 0;
-                int m = 0; //types of stock lengths
-                int n =  0; //types of pieces required
-                int[] stockLengths = new int[0];
-                double[] stockCostsForLength = new double[0];
-                int[]  orderLengths = new int[0];
-                int[] orderLengthQuantities = new int[0];
+//                int m = 0; //types of stock lengths
+//                int n =  0; //types of pieces required
+                ArrayList<Integer> stockLengths = new ArrayList<>();
+                ArrayList<Double> stockCostsForLength = new ArrayList<>();
+                ArrayList<Integer>  orderLengths = new ArrayList<>();
+                ArrayList<Integer> orderLengthQuantities = new ArrayList<>();
                 try {
                     csvReader = new BufferedReader(new java.io.FileReader(CSV));
                     while ((line = csvReader.readLine()) != null) {
@@ -56,27 +57,36 @@ public class FileReaderClass {
                 return new Order(orderLengths, orderLengthQuantities, stockLengths, stockCostsForLength);
             }
 
-            private int[] fillIntArray(int length, String[] parsedElements)
+            private ArrayList<Integer> fillIntArray(int length, String[] parsedElements)
             {
-                int[] genericIntList = new int[length - 1];
-                genericIntList[0] = Integer.parseInt(parsedElements[0].split(":")[1].trim());
-                for (int i = 1; i < length - 1; i++) {
-                        genericIntList[i] = Integer.parseInt(parsedElements[i].trim());
+                ArrayList<Integer> genericIntList = new ArrayList<>();
+                String[] test = parsedElements[0].split("");
+                genericIntList.add(0, Integer.parseInt(parsedElements[0].split(":")[1].trim()));
+                for (int i = 1; i < length; i++) {
+                    if (length - i == 1) {
+                        parsedElements[length - 1] = parsedElements[length - 1].replace("\"", "");
+                    }
+                    genericIntList.add(i, Integer.parseInt(parsedElements[i].trim()));
                    }
 
                 return genericIntList;
             }
 
-            private double[] fillDoubleArray(int length, String[] parsedElements) {
-                double[] genericDoubleList = new double[length -1];
-                genericDoubleList[0] = Double.parseDouble(parsedElements[0].split(":")[1].trim());
-                for (int i = 1; i < length - 1; i++) {
-                           genericDoubleList[i] = Double.parseDouble(parsedElements[i].trim());
+            private ArrayList<Double> fillDoubleArray(int length, String[] parsedElements) {
+                ArrayList<Double> genericDoubleList = new ArrayList<>();
+                genericDoubleList.add(0, Double.parseDouble(parsedElements[0].split(":")[1].trim()));
+                for (int i = 1; i < length; i++) {
+                    if (length - i == 1) {
+                        parsedElements[length - 1] = parsedElements[length - 1].replace("\"", "");
+                    }
+                           genericDoubleList.add(i, Double.parseDouble(parsedElements[i].trim()));
                     }
                 return genericDoubleList;
             }
 
-
+            public ArrayList<Order> getAllOrders() {
+                return  this.allOrders;
+            }
         }
 
 
