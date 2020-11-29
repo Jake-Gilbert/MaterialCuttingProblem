@@ -1,44 +1,63 @@
 package com.github.materialcuttingproblem;
 
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
 public class OrderSolver {
 
     public ArrayList<Order> ordersToSolve;
-    public OrderSolver(ArrayList<Order> ordersToSolve) {
-        this.ordersToSolve = ordersToSolve;
+    public OrderSolver() {
     }
-
-    public void solveOrder(Order order) {
+    public double solveOrder(Order order) {
+        Random random = new Random();
         int pieceSizesRemaining = order.getOrderLengthsAndQuantities().size();
-        int[] pieceSizes = populatePieceSizes(pieceSizesRemaining, order.getOrderLengthsAndQuantities());
-        int[] quantitiesForEachSize = populateSizeQuantity(pieceSizesRemaining, order.getOrderLengthsAndQuantities());
-        int[] availableStocks = order.getStockLengths().clone();
+        //Order lengths and quantity of each length
+        ArrayList<Integer> orderLengthsRequested = order.getOrderLengths();
+        ArrayList<Integer> quantitiesForEachSize = order.getQuantitiesForEachLength();
+        Map<Integer, Integer> ordersAndQuantities = initialiseOrdersAndQuantities(orderLengthsRequested, quantitiesForEachSize);
 
-        while (pieceSizesRemaining > 0) {
-            //TODO
-            //keep cutting
-            Stock stock = new Stock(availableStocks[4]);
-        }
+        //Available stock lengths and cost of each length
+        ArrayList<Stock> availableStockLengths = order.getStockLengths();
+        //Stores used stock to calculate costs at the end
+        Map<Integer, Integer> usedStocksTracker = initialiseStocksAndQuantities(availableStockLengths);
+//        initialiseStocksUsedMap(availableStockLengths);
+            int pointer = 0;
+            PieceCutter pieceCutter = new PieceCutter();
+            usedStocksTracker = pieceCutter.useEntireStockLength(ordersAndQuantities, availableStockLengths);
+
+
+        CostCalculator costCalculator = new CostCalculator(usedStocksTracker);
+        //return costCalculator.getSolution; TODOg
+        return costCalculator.getSolution(order.getStockCosts());
     }
 
-    private int[] populatePieceSizes(int pieceSizesRemaining, Map<Integer,Integer> orderLengthsAndQuantities) {
-        int[] pieceSizes = new int[pieceSizesRemaining];
-        int index = 0;
-        for (int pieceSize : orderLengthsAndQuantities.keySet()) {
-            pieceSizes[index] = pieceSize;
-            index++;
+
+
+    //Initialise order lengths associated with their quantities
+    private Map<Integer, Integer> initialiseOrdersAndQuantities(ArrayList<Integer> orderLengthsRequested, ArrayList<Integer> orderLengthQuantities) {
+        Map<Integer, Integer> orderLengthsAndQuantities = new LinkedHashMap<>();
+        for (int i = 0; i < orderLengthsRequested.size(); i++) {
+            orderLengthsAndQuantities.put(orderLengthsRequested.get(i), orderLengthQuantities.get(i));
         }
-        return pieceSizes;
+        return orderLengthsAndQuantities;
     }
 
-    private int[] populateSizeQuantity(int pieceSizesRemaining, Map<Integer, Integer> orderLengthsAndQuantities) {
-        int[] quantitiesForEachSize = new int[pieceSizesRemaining];
-        for (int i = 0; i < pieceSizesRemaining; i++) {
-            quantitiesForEachSize[i] = orderLengthsAndQuantities.get(i);
+    private Map<Integer, Integer> initialiseStocksAndQuantities(ArrayList<Stock> stockLengthsAvailable) {
+        Map<Integer, Integer> stockTracker= new LinkedHashMap<>();
+        for (Stock stockLength : stockLengthsAvailable) {
+            stockTracker.put(stockLength.getLength(), 0);
         }
-        return quantitiesForEachSize;
+        return stockTracker;
     }
+
+    private double getOverallCostOfSolution(Map<Stock, Integer> costCalculation) {
+        double totalCost = 0;
+        for (Stock stockUsed : costCalculation.keySet()) {
+            totalCost += stockUsed.getLength() * costCalculation.get(stockUsed);
+        }
+        return totalCost;
+    }
+
+
+
 
 }
