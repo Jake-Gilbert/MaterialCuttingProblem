@@ -22,7 +22,7 @@ public class OrderSolver {
 //        initialiseStocksUsedMap(availableStockLengths);
             int pointer = 0;
             PieceCutter pieceCutter = new PieceCutter();
-            usedStocksTracker = pieceCutter.useEntireStockLength(ordersAndQuantities, availableStockLengths);
+            usedStocksTracker = pieceCutter.completeAllOrders(ordersAndQuantities, availableStockLengths);
 
 
         CostCalculator costCalculator = new CostCalculator(usedStocksTracker);

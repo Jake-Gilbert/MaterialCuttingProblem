@@ -4,47 +4,62 @@ import java.util.*;
 
 public class PieceCutter {
 
-     Map<Integer, Integer> stocksUsed;
-    static ArrayList<Integer> piecesRemaining;
+     public Map<Integer, Integer> stocksUsed;
+     ArrayList<Integer> piecesRemaining;
     public PieceCutter() {
         piecesRemaining = new ArrayList<>();
     }
-
-    private void cutAsManyTimesAsPossible(Stock localStock, Stock originalStock, int orderLength, Map<Integer, Integer> ordersAndQuantities, ArrayList<Integer> orderTracker) {
-
+    //
+    private void cutAsManyTimesAsPossible(Stock localStock, Stock originalStock, Map<Integer, Integer> ordersAndQuantities) {
+        ArrayList<Integer> orderTracker = new ArrayList<>();
         while (localStock.getLength() > 0) {
-            if (orderTracker == null) {
-                orderTracker = new ArrayList<>();
+            int orderLength = getRandomOrderLength(ordersAndQuantities);
+            while (orderLength <= localStock.getLength() && checkQuantitiesRemaining(orderLength, ordersAndQuantities) > 0) {
+                if (orderLength != 0) {
+                        if (localStock.getLength() == orderLength) {
+                            orderTracker.add(orderLength);
+                            localStock.setLength(localStock.getLength() - orderLength);
+                            decrementQuantity(ordersAndQuantities, orderLength);
+                            updateStocksUsed(originalStock);
+                        }
+                        else {
+                            orderTracker.add(orderLength);
+                            localStock.setLength(localStock.getLength() - orderLength);
+                            decrementQuantity(ordersAndQuantities, orderLength);
+                        }
+                }
+
             }
 
-            if (localStock.getLength() == orderLength && localStock.getLength() > 0) {
-                orderTracker.add(orderLength);
-                localStock.setLength(0);
-                updateStocksUsed(originalStock);
-                decrementQuantity(ordersAndQuantities, orderLength);
 
-            } else if (localStock.getLength() > orderLength) {
-                orderTracker.add(orderLength);
-                localStock.setLength(localStock.getLength() - orderLength);
-                decrementQuantity(ordersAndQuantities, orderLength);
-
-            } else {
-                int newValidLength = checkValidSolutionsExist(localStock.getLength(), ordersAndQuantities);
-                if (newValidLength > 0) {
-                    cutAsManyTimesAsPossible(localStock, originalStock, newValidLength, ordersAndQuantities, orderTracker);
-                }
-                else {
-                    if (localStock.getLength() > 0 && newValidLength == 0) {
-                        updateStocksUsed(originalStock);
-                        piecesRemaining.add(localStock.getLength());
+        orderLength = Integer.MAX_VALUE;
+            if (orderLength > localStock.getLength()) {
+                int newOrderLength = checkValidSolutionsExist(localStock.getLength(), ordersAndQuantities);
+                if (newOrderLength != 0) {
+                    while (localStock.getLength() >= newOrderLength && checkQuantitiesRemaining(newOrderLength, ordersAndQuantities) > 0) {
+                        if (localStock.getLength() == newOrderLength) {
+                            orderTracker.add(newOrderLength);
+                            localStock.setLength(localStock.getLength() - newOrderLength);
+                            updateStocksUsed(originalStock);
+                            decrementQuantity(ordersAndQuantities, newOrderLength);
+                        }
+                        else {
+                            orderTracker.add(newOrderLength);
+                            localStock.setLength(localStock.getLength() - newOrderLength);
+                            decrementQuantity(ordersAndQuantities, newOrderLength);
+                        }
                     }
 
+                }
+                    updateStocksUsed(originalStock);
                     localStock.setLength(0);
-                    System.out.println("Stock length used: " + originalStock.getLength() + " orders completed: " + orderTracker);
+                    System.out.println("Stock length: " +originalStock.getLength() + " used to cut: " + orderTracker);
                 }
             }
+
         }
-    }
+
+
 
     private int getRandomOrderLength(Map<Integer, Integer> orderLengthsAndQuantities) {
         Random random = new Random();
@@ -58,47 +73,64 @@ public class PieceCutter {
     }
 
 
-    public Map<Integer, Integer> useEntireStockLength(Map<Integer, Integer> orderLengthsAndQuantities, ArrayList<Stock> availableStockLengths) {
+    public Map<Integer, Integer> completeAllOrders(Map<Integer, Integer> orderLengthsAndQuantities, ArrayList<Stock> availableStockLengths) {
         stocksUsed = initialiseStocksUsedMap(availableStockLengths);
         Random random = new Random();
         Map<Integer, Integer> ordersAndQuantities = new LinkedHashMap<>(orderLengthsAndQuantities);
-
-        //keeps track of which pieces have been cut using one stock piece
-        ArrayList<Integer> cuttingTracker = new ArrayList<>();
-        int i = 1;
         while (checkQuantitiesRemaining(ordersAndQuantities) > 0) {
-            Stock stockToUse = getRandomStockLength(availableStockLengths);
-            Stock localStockCopy = new Stock(stockToUse.getLength());
+                     Stock stockToUse = getRandomStockLength(availableStockLengths);
+                    if (piecesRemaining.size() > 0) {
+                        PieceRecombination pieceRecombination = new PieceRecombination();
+                        Stock recombinedStock = pieceRecombination.generateFromPiecesRemaining(piecesRemaining, availableStockLengths);
+                        if (recombinedStock != null) {
+                            System.out.println("Recombined stock created of length " + recombinedStock.getLength());
+                            stockToUse = recombinedStock;
+                        }
+                    }
 
-            while (localStockCopy.getLength() > 0) {
-                int orderLength = getRandomOrderLength(ordersAndQuantities);
+                     Stock localStockCopy = new Stock(stockToUse.getLength());
+
                     //Cuts from the stock as many orders as possible
-                ArrayList<Integer> orderTracker = new ArrayList<>();
-                cutAsManyTimesAsPossible(localStockCopy, stockToUse, orderLength, ordersAndQuantities, orderTracker);
+
+                    cutAsManyTimesAsPossible(localStockCopy, stockToUse, ordersAndQuantities);
+
 
                     }
 
-            }
 
-        //System.out.println("Stock length " + stockToUse.getLength() + " has been used to cut order lengths: " + orderTracker);
+
+
+    //System.out.println("Stock length " + stockToUse.getLength() + " has been used to cut order lengths: " + orderTracker);
         return stocksUsed;
     }
 
 
         private int checkValidSolutionsExist(int length, Map<Integer, Integer> orderLengthsAndQuantities) {
-        if (checkQuantitiesRemaining(orderLengthsAndQuantities) <= 0){
-            return 0;
-        }
-        else {
-            for (int orderLength : orderLengthsAndQuantities.keySet()) {
-                if (orderLength < length) {
-                    return orderLength;
+            if (checkQuantitiesRemaining(orderLengthsAndQuantities) > 0) {
+                ArrayList<Integer> validOrderLengths = new ArrayList<>();
+                for (int orderLength : orderLengthsAndQuantities.keySet()) {
+                    if (orderLengthsAndQuantities.get(orderLength) > 0 && length >= orderLength) {
+                        validOrderLengths.add(orderLength);
+                    }
                 }
+                Random random = new Random();
+                if (validOrderLengths.size() > 0) {
+                    return validOrderLengths.get(random.nextInt(validOrderLengths.size()));
+                }
+
             }
-        }
             return 0;
         }
 
+        private int checkQuantitiesRemaining(int orderLength, Map<Integer, Integer> ordersAndQuantities) {
+                if (ordersAndQuantities.containsKey(orderLength)) {
+                    if (ordersAndQuantities.get(orderLength) > 0) {
+                        return ordersAndQuantities.get(orderLength);
+                    }
+                }
+
+                return 0;
+        }
 
         private int checkQuantitiesRemaining(Map<Integer, Integer> ordersAndQuantities) {
             int count = 0;
@@ -133,9 +165,12 @@ public class PieceCutter {
         }
 
         private void decrementQuantity(Map<Integer, Integer> orderLengthsAndQuantities, int lengthToCut){
+        if (checkQuantitiesRemaining(lengthToCut, orderLengthsAndQuantities) > 0) {
             if (orderLengthsAndQuantities.get(lengthToCut) >= 1) {
                 orderLengthsAndQuantities.put(lengthToCut, orderLengthsAndQuantities.get(lengthToCut) - 1);
             }
+        }
+
         }
 
         private Map<Integer, Integer> updateStocksUsed(Stock stockUsed) {
@@ -145,7 +180,9 @@ public class PieceCutter {
         }
 
         private Map<Integer, Integer> getStocksUsed() {
-        return stocksUsed;
+            return stocksUsed;
         }
-}
+
+    }
+
 
