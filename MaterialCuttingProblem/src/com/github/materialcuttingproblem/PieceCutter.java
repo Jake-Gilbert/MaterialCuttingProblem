@@ -10,8 +10,9 @@ public class PieceCutter {
         piecesRemaining = new ArrayList<>();
     }
     //
-    private void cutAsManyTimesAsPossible(Stock localStock, Stock originalStock, Map<Integer, Integer> ordersAndQuantities) {
+    private void cutAsManyTimesAsPossible(Stock localStock, Map<Integer, Integer> ordersAndQuantities) {
         ArrayList<Integer> orderTracker = new ArrayList<>();
+        Stock originalStock = new Stock(localStock.getLength());
         while (localStock.getLength() > 0) {
             int orderLength = getRandomOrderLength(ordersAndQuantities);
             while (orderLength <= localStock.getLength() && checkQuantitiesRemaining(orderLength, ordersAndQuantities) > 0) {
@@ -52,6 +53,7 @@ public class PieceCutter {
 
                 }
                     updateStocksUsed(originalStock);
+                    piecesRemaining.add(localStock.getLength());
                     localStock.setLength(0);
                     System.out.println("Stock length: " +originalStock.getLength() + " used to cut: " + orderTracker);
                 }
@@ -61,7 +63,7 @@ public class PieceCutter {
 
 
 
-    private int getRandomOrderLength(Map<Integer, Integer> orderLengthsAndQuantities) {
+    protected int getRandomOrderLength(Map<Integer, Integer> orderLengthsAndQuantities) {
         Random random = new Random();
         ArrayList<Integer> orderLengths = new ArrayList<>();
         for (int orderLength : orderLengthsAndQuantities.keySet()) {
@@ -88,11 +90,10 @@ public class PieceCutter {
                         }
                     }
 
-                     Stock localStockCopy = new Stock(stockToUse.getLength());
 
                     //Cuts from the stock as many orders as possible
 
-                    cutAsManyTimesAsPossible(localStockCopy, stockToUse, ordersAndQuantities);
+                    cutAsManyTimesAsPossible(stockToUse, ordersAndQuantities);
 
 
                     }
@@ -100,12 +101,11 @@ public class PieceCutter {
 
 
 
-    //System.out.println("Stock length " + stockToUse.getLength() + " has been used to cut order lengths: " + orderTracker);
         return stocksUsed;
     }
 
 
-        private int checkValidSolutionsExist(int length, Map<Integer, Integer> orderLengthsAndQuantities) {
+        protected int checkValidSolutionsExist(int length, Map<Integer, Integer> orderLengthsAndQuantities) {
             if (checkQuantitiesRemaining(orderLengthsAndQuantities) > 0) {
                 ArrayList<Integer> validOrderLengths = new ArrayList<>();
                 for (int orderLength : orderLengthsAndQuantities.keySet()) {
@@ -122,7 +122,7 @@ public class PieceCutter {
             return 0;
         }
 
-        private int checkQuantitiesRemaining(int orderLength, Map<Integer, Integer> ordersAndQuantities) {
+        protected int checkQuantitiesRemaining(int orderLength, Map<Integer, Integer> ordersAndQuantities) {
                 if (ordersAndQuantities.containsKey(orderLength)) {
                     if (ordersAndQuantities.get(orderLength) > 0) {
                         return ordersAndQuantities.get(orderLength);
@@ -132,7 +132,7 @@ public class PieceCutter {
                 return 0;
         }
 
-        private int checkQuantitiesRemaining(Map<Integer, Integer> ordersAndQuantities) {
+        protected int checkQuantitiesRemaining(Map<Integer, Integer> ordersAndQuantities) {
             int count = 0;
             for (int orderLength : ordersAndQuantities.keySet()) {
                 if (ordersAndQuantities.get(orderLength) > 0) {
@@ -151,7 +151,7 @@ public class PieceCutter {
             return stocksUsed;
         }
 
-        private Map<Integer, Integer> initialiseStocksUsedMap(ArrayList<Stock> stockLengths) {
+        protected Map<Integer, Integer> initialiseStocksUsedMap(ArrayList<Stock> stockLengths) {
             Map<Integer, Integer> stocksUsed = new HashMap<>();
             for (Stock stock : stockLengths) {
                 stocksUsed.put(stock.getLength(), 0);
@@ -164,7 +164,7 @@ public class PieceCutter {
                 return stockLengths.get(random.nextInt(stockLengths.size()));
         }
 
-        private void decrementQuantity(Map<Integer, Integer> orderLengthsAndQuantities, int lengthToCut){
+        protected void decrementQuantity(Map<Integer, Integer> orderLengthsAndQuantities, int lengthToCut){
         if (checkQuantitiesRemaining(lengthToCut, orderLengthsAndQuantities) > 0) {
             if (orderLengthsAndQuantities.get(lengthToCut) >= 1) {
                 orderLengthsAndQuantities.put(lengthToCut, orderLengthsAndQuantities.get(lengthToCut) - 1);

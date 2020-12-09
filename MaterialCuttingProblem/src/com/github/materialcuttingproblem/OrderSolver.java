@@ -9,7 +9,6 @@ public class OrderSolver {
     }
     public double solveOrder(Order order) {
         Random random = new Random();
-        int pieceSizesRemaining = order.getOrderLengthsAndQuantities().size();
         //Order lengths and quantity of each length
         ArrayList<Integer> orderLengthsRequested = order.getOrderLengths();
         ArrayList<Integer> quantitiesForEachSize = order.getQuantitiesForEachLength();
@@ -47,14 +46,6 @@ public class OrderSolver {
             stockTracker.put(stockLength.getLength(), 0);
         }
         return stockTracker;
-    }
-
-    private double getOverallCostOfSolution(Map<Stock, Integer> costCalculation) {
-        double totalCost = 0;
-        for (Stock stockUsed : costCalculation.keySet()) {
-            totalCost += stockUsed.getLength() * costCalculation.get(stockUsed);
-        }
-        return totalCost;
     }
 
 
