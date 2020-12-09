@@ -8,15 +8,11 @@ public class main {
         int count = 0;
         while (count < ordersGenerated) {
             OrderSolver orderSolver = new OrderSolver();
-            System.out.println("Cost of operation was £" + orderSolver.solveOrder(fileReaderClass.getAllOrders().get(0)));
+            System.out.println("Cost of operation was £" + orderSolver.solveOrder(fileReaderClass.getOrder()));
             System.out.println();
             count++;
         }
 
-
-
-        //CuttingController cuttingController = new CuttingController();
-        //Order order = new Order(new int[]{10, 20, 30}, new int[]{7, 5, 2});
 
     }
 }

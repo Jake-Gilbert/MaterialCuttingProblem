@@ -7,9 +7,12 @@ import java.util.ArrayList;
 public class FileReaderClass {
 
         ArrayList<Order> allOrders;
+        Order order;
         public FileReaderClass(final String CSV) {
-            allOrders = new ArrayList<>();
-             allOrders.add(initialiseCollection(CSV));
+//            allOrders = new ArrayList<>();
+//             allOrders.add(initialiseCollection(CSV));
+             order = initialiseCollection(CSV);
+            System.out.println();
         }
 
         private Order initialiseCollection(String CSV) {
@@ -17,8 +20,6 @@ public class FileReaderClass {
                 String line = "";
                 ArrayList<String[]> dataInCsv = new ArrayList<>();;
                 int pointer = 0;
-//                int m = 0; //types of stock lengths
-//                int n =  0; //types of pieces required
                 ArrayList<Integer> stockLengths = new ArrayList<>();
                 ArrayList<Double> stockCostsForLength = new ArrayList<>();
                 ArrayList<Integer>  orderLengths = new ArrayList<>();
@@ -84,8 +85,8 @@ public class FileReaderClass {
                 return genericDoubleList;
             }
 
-            public ArrayList<Order> getAllOrders() {
-                return  this.allOrders;
+            public Order getOrder() {
+                return order;
             }
         }
 
