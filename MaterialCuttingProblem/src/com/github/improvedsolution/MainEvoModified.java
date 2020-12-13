@@ -1,5 +1,9 @@
-package com.github.baselinesolution;
+package com.github.improvedsolution;
 
+import com.github.baselinesolution.Main;
+import com.github.baselinesolution.OrderSolverEvo;
+import com.github.baselinesolution.ParentSelection;
+import com.github.baselinesolution.Population;
 import com.github.materialcuttingproblem.FileReaderClass;
 import com.github.materialcuttingproblem.Order;
 import com.github.materialcuttingproblem.Stock;
@@ -7,14 +11,14 @@ import com.github.materialcuttingproblem.Stock;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class Main {
+public class MainEvoModified extends Main {
 
     public static void main(String[] args) {
         FileReaderClass fileReader = new FileReaderClass("/Users/Jake/Documents/repos/MaterialCuttingProblem/MaterialCuttingProblem/csv/cutting_problem_instance2.csv");
         Order orderToUse = fileReader.getOrder();
         int numberOfGenerations = 50;
         int populationSize = 50;
-        simulate( numberOfGenerations,  populationSize, orderToUse, orderToUse.getOrderLengthsAndQuantities(), orderToUse.getStockLengths() );
+        simulateModified(numberOfGenerations,  populationSize, orderToUse, orderToUse.getOrderLengthsAndQuantities(), orderToUse.getStockLengths() );
 
     }
 
@@ -28,38 +32,13 @@ public class Main {
         return cheapestSolutions;
     }
 
-    protected static void getBestOfGeneration(int currentGeneration, ArrayList<OrderSolverEvo> generation) {
-        OrderSolverEvo best = generation.get(0);
-        for (OrderSolverEvo orderSolverEvo : generation) {
-            if (orderSolverEvo.getCost() < best.getCost()) {
-                best = orderSolverEvo;
-            }
-        }
-        System.out.println("Cheapest solution of generation: " + currentGeneration);
-        best.printStockCuts();
-        System.out.println("Cheapest solution costs: £" + best.getCost());
-    }
 
-    protected static void getAverageOfGeneration(int currentGeneration, ArrayList<OrderSolverEvo> generation) {
-        int averageCost = 0;
-        for (OrderSolverEvo orderSolverEvo : generation) {
-            averageCost += orderSolverEvo.getCost();
-        }
-        averageCost /=  generation.size();
-        System.out.println("Average cost of generation " + currentGeneration + ": £" + averageCost);
-
-        System.out.println();
-    }
-
-    protected static void generateRecombinedParents(ArrayList<OrderSolverEvo> parentPair, Map<Integer, Integer> orderLengthsAndQuantities, ArrayList<Stock> stockLengths) {
-        Recombination recombination = new Recombination(parentPair.get(0).getStocksAndQuantities(), parentPair.get(1).getStocksAndQuantities(), orderLengthsAndQuantities, stockLengths);
-    }
-    private static ArrayList<OrderSolverEvo> replaceParents(Order order, ArrayList<OrderSolverEvo> parents, int populationSize, Map<Integer, Integer> orderLengthsAndQuantities, ArrayList<Stock> stockLengths) {
+    protected static ArrayList<OrderSolverEvo> replaceParents(Order order, ArrayList<OrderSolverEvo> parents, int populationSize, Map<Integer, Integer> orderLengthsAndQuantities, ArrayList<Stock> stockLengths) {
         ArrayList<OrderSolverEvo> newPopulation = new ArrayList<>();
         for (int i = 0; i < populationSize; i++) {
             ArrayList<OrderSolverEvo> parentPair = generateParentPair(parents);
             generateRecombinedParents(parentPair, orderLengthsAndQuantities, stockLengths);
-            Recombination recombination = new Recombination(parentPair.get(0).getStocksAndQuantities(), parentPair.get(1).getStocksAndQuantities(), orderLengthsAndQuantities, stockLengths);
+            RecombinationModified recombination = new RecombinationModified(parentPair.get(0).getStocksAndQuantities(), parentPair.get(1).getStocksAndQuantities(), orderLengthsAndQuantities, stockLengths);
             OrderSolverEvo offspring = new OrderSolverEvo(order, recombination.getOffspring(), orderLengthsAndQuantities);
             if (offspring.getCost() > parentPair.get(0).getCost()) {
                 offspring = parentPair.get(0);
@@ -69,7 +48,7 @@ public class Main {
         return newPopulation;
     }
 
-    private static void simulate(int numberOfGenerations, int populationSize, Order order, Map<Integer, Integer> orderLengthsAndQuantities, ArrayList<Stock> stockLengths) {
+    private static void simulateModified(int numberOfGenerations, int populationSize, Order order, Map<Integer, Integer> orderLengthsAndQuantities, ArrayList<Stock> stockLengths) {
         Population population = new Population(populationSize, order);
         getBestOfGeneration(0, population.solutions);
         getAverageOfGeneration(0,  population.solutions);
@@ -91,3 +70,4 @@ public class Main {
         }
     }
 }
+

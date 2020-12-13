@@ -90,11 +90,6 @@ public class PieceCutterEvo extends PieceCutter {
         return stocksUsed;
     }
 
-    private void trackTheCuts(int length, ArrayList<Integer> piecesCut) {
-      //  solution.trackTheCuts(length, piecesCut);
-    //    entireOrder.put(length, piecesCut);
-    }
-
     private ArrayList<Integer> orderTheStockLengths(Map<Integer, Integer> stocksAndQuantities) {
         ArrayList<Integer> stocksToBePassed = new ArrayList<>();
         for (Integer stockLength : stocksAndQuantities.keySet()) {

@@ -6,11 +6,8 @@ import java.util.ArrayList;
 
 public class FileReaderClass {
 
-        ArrayList<Order> allOrders;
         Order order;
         public FileReaderClass(final String CSV) {
-//            allOrders = new ArrayList<>();
-//             allOrders.add(initialiseCollection(CSV));
              order = initialiseCollection(CSV);
             System.out.println();
         }

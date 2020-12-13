@@ -7,7 +7,7 @@ import java.util.Random;
 public class ParentSelection {
 
         private ArrayList<OrderSolverEvo> tournament;
-        private ArrayList<Map<Integer, Integer>> cheapestSolutions;
+        private  ArrayList<Map<Integer, Integer>> cheapestSolutions;
         private final ArrayList<OrderSolverEvo> originalPopulation;
         public ParentSelection(ArrayList<OrderSolverEvo> population) {
             cheapestSolutions = new ArrayList<>();

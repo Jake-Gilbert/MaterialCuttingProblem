@@ -15,9 +15,18 @@ public class Recombination {
     public Recombination(Map<Integer, Integer> cheapestSolution, Map<Integer, Integer> secondCheapest, Map<Integer, Integer> orderLengthAndQuantities, ArrayList<Stock> availableStockLengths) {
         this.availableStockLengths = availableStockLengths;
         offspring = performCrossover(cheapestSolution, secondCheapest, orderLengthAndQuantities);
+        Random random = new Random();
+        double mutate = random.nextDouble();
+        if (mutate <= 0.3) {
+            Mutation mutation = new Mutation(calculateTotalLengthRequired(orderLengthAndQuantities), offspring, availableStockLengths);
+            offspring = mutation.getMutatedSolutions();
+        }
     }
 
-    private int calculateTotalLengthRequired(Map<Integer, Integer> orderLengthAndQuantity) {
+    public Recombination() {
+    }
+
+    protected int calculateTotalLengthRequired(Map<Integer, Integer> orderLengthAndQuantity) {
         int total = 0;
         for (int order : orderLengthAndQuantity.keySet()) {
             if (orderLengthAndQuantity.get(order) > 0) {
@@ -27,7 +36,7 @@ public class Recombination {
         return total;
     }
 
-    private Map<Integer, Integer> initialiseStockMap() {
+    protected Map<Integer, Integer> initialiseStockMap() {
         Map<Integer, Integer> initialisedStockMap = new LinkedHashMap<>();
         for (Stock stockLength : availableStockLengths) {
            initialisedStockMap.put(stockLength.getLength(), 0);
@@ -35,7 +44,7 @@ public class Recombination {
         return initialisedStockMap;
     }
 
-    private int checkContainsStock(int stockLength, Map<Integer, Integer> solution) {
+    protected int checkContainsStock(int stockLength, Map<Integer, Integer> solution) {
         if (solution.get(stockLength) > 0) {
             return stockLength;
         }
@@ -47,7 +56,6 @@ public class Recombination {
         Map<Integer, Integer> localFirstSolution = new LinkedHashMap<>(firstSolution);
         int initialTotal = total;
         Random random = new Random();
-
         while (total > initialTotal / 2) {
             int stockLengthToAdd = availableStockLengths.get(random.nextInt(availableStockLengths.size())).getLength();
             if (checkContainsStock(stockLengthToAdd, localFirstSolution) > 0) {
@@ -77,11 +85,11 @@ public class Recombination {
     public Map<Integer, Integer> getOffspring() {
         return offspring;
     }
-        private Map<Integer, Integer> performCrossover(Map<Integer, Integer> cheapest, Map<Integer, Integer> secondCheapest, Map<Integer, Integer> orderLengthAndQuantities) {
+    private Map<Integer, Integer> performCrossover(Map<Integer, Integer> cheapest, Map<Integer, Integer> secondCheapest, Map<Integer, Integer> orderLengthAndQuantities) {
             total = calculateTotalLengthRequired(orderLengthAndQuantities);
             Map<Integer, Integer>  offspringSolution = fillWIthFirstSolutionStock(cheapest);
             offspringSolution = fillWithSecondSolutionStock(offspringSolution, secondCheapest);
-            //TODO : mutation and average cost per generation
+
             return offspringSolution;
     }
 
